@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twitter Scraper Webhook</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .container {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      color: #1DA1F2;
+    }
+    pre {
+      background-color: #f1f1f1;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    button {
+      background-color: #1DA1F2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #0c85d0;
+    }
+    input, select {
+      padding: 8px;
+      margin: 5px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Twitter Scraper Webhook</h1>
+  <p>Use this page to test the Twitter scraper webhook.</p>
+  
+  <div class="container">
+    <h2>Trigger Webhook</h2>
+    <div class="form-group">
+      <label for="authToken">Auth Token:</label>
+      <input type="text" id="authToken" placeholder="Enter your auth token">
+    </div>
+    <div class="form-group">
+      <label for="maxTweets">Max Tweets Per Profile:</label>
+      <input type="number" id="maxTweets" value="10" min="1" max="100">
+    </div>
+    <div class="form-group">
+      <label for="includeRetweets">Include Retweets:</label>
+      <select id="includeRetweets">
+        <option value="false">No</option>
+        <option value="true">Yes</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="profiles">Twitter Profiles (comma-separated):</label>
+      <input type="text" id="profiles" placeholder="e.g., elonmusk,BillGates">
+    </div>
+    <button id="triggerWebhook">Trigger Webhook</button>
+  </div>
+  
+  <div class="container">
+    <h2>Response</h2>
+    <pre id="response">No response yet.</pre>
+  </div>
+
+  <script>
+    document.getElementById('triggerWebhook').addEventListener('click', async () => {
+      const authToken = document.getElementById('authToken').value;
+      const maxTweets = document.getElementById('maxTweets').value;
+      const includeRetweets = document.getElementById('includeRetweets').value;
+      const profilesInput = document.getElementById('profiles').value;
+      
+      // Validate token
+      if (!authToken) {
+        alert('Please enter an auth token');
+        return;
+      }
+      
+      // Parse profiles
+      let profiles = [];
+      if (profilesInput) {
+        profiles = profilesInput.split(',').map(p => p.trim()).filter(p => p);
+      }
+      
+      // Show loading state
+      const responseElement = document.getElementById('response');
+      responseElement.textContent = 'Loading...';
+      
+      try {
+        // Make API call
+        const response = await fetch('/api/scrape-tweets', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({
+            options: {
+              maxTweetsPerProfile: parseInt(maxTweets, 10),
+              includeRetweets: includeRetweets === 'true'
+            },
+            profiles: profiles.length > 0 ? profiles : undefined
+          })
+        });
+        
+        const data = await response.json();
+        
+        // Display formatted response
+        responseElement.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        responseElement.textContent = `Error: ${error.message}`;
+      }
+    });
+  </script>
+</body>
+</html> 

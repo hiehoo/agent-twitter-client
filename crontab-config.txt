@@ -1,0 +1,2 @@
+# Run Twitter feed scraper daily at 8:00 AM
+0 8 * * * /Users/hieuho/agent-twitter-client/run-daily-scraper.sh 

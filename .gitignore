@@ -120,3 +120,6 @@ yarn.lock
 
 cookies.json
 .DS_Store
+
+# Local Netlify folder
+.netlify

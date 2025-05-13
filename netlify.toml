@@ -1,0 +1,26 @@
+[build]
+  # Directory with built assets for deployment
+  publish = "public"
+  # Directory with serverless functions code
+  functions = "netlify/functions"
+  # Build command (you might need a different one depending on your project)
+  command = "npm run build-netlify"
+
+# Set environment variables (for development - use Netlify UI for production)
+[build.environment]
+  NODE_VERSION = "18"
+
+# Define redirects to make functions available at nice URLs
+[[redirects]]
+  from = "/api/scrape-tweets"
+  to = "/.netlify/functions/scrape-tweets"
+  status = 200
+  force = true
+
+# Ensure CORS works properly
+[[headers]]
+  for = "/*"
+    [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization" 
